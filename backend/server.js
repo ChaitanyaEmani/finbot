@@ -22,7 +22,7 @@ app.use(express.json()); // Middleware to parse JSON bodies
 // Routes
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/finance', financeRoutes);
+app.use('/api', financeRoutes);
 
 // Root route
 app.get('/', (req, res) => {

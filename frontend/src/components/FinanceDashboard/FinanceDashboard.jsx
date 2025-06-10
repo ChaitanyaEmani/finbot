@@ -23,7 +23,7 @@ const FinanceDashboard = ({ refreshTrigger }) => {
   const [error, setError] = useState("");
   const [aiRecommendations, setAiRecommendations] = useState("");
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
-
+  const API = import.meta.env.VITE_API_BASE_URL;
   const fallbackIdeas = `
 **Business Ideas:**
 1. Start a subscription box service for eco-friendly products.
@@ -49,7 +49,7 @@ const FinanceDashboard = ({ refreshTrigger }) => {
       setLoading(true);
       setError("");
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8000/api/finance", {
+      const res = await axios.get(`${API}/api/finance`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
