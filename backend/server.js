@@ -13,7 +13,7 @@ const app = express();
 
 // ✅ CORS Middleware — allow requests from frontend
 app.use(cors({
-  origin: 'https://finbot-ten.vercel.app/', // Change this to your frontend URL in production
+  origin: ['http://localhost:5173', 'https://finbot-ten.vercel.app'], // allow both local and production
   credentials: true,
 }));
 
