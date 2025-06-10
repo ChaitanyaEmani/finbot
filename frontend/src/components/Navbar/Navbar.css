@@ -1,0 +1,54 @@
+/* Navbar.css */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white; 
+ 
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px;
+}
+
+hr{
+    margin: 0;
+    border: none;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.logout-btn {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background-color: #000;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: none;
+  font-size: 14px;
+  z-index: 10;
+}
+
+.profile-container:hover .logout-btn {
+  display: block;
+}
+
+.profile-icon {
+  transition: transform 0.2s ease;
+}
+
+.profile-container:hover .profile-icon {
+  transform: scale(1.1);
+}
+

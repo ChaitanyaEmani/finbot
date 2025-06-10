@@ -1,0 +1,65 @@
+/* Home.css */
+
+.home {
+  width: 100%;
+  min-height: 85vh;
+  background: #f7f9fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 20px;
+}
+
+.home-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 50px;
+  max-width: 1200px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.home-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.home-text h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.home-text p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.home-text button {
+  padding: 12px 25px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.home-text button:hover {
+  background-color: #0056b3;
+}
+
+.image {
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+}
+
+.image img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}

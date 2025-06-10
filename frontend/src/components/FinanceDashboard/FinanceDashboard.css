@@ -1,0 +1,199 @@
+/* FinanceDashboard.css */
+
+.finance-dashboard {
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-header h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.toggle-button {
+  /* padding: 0.5rem 0.2rem; */
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #0056b3;
+}
+
+.ai-recommendations-section{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-recommendations-content{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-recommendations-content p {
+  font-size: 0.9rem;
+  color: #555;
+  padding: 10px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  background-color: #ffe0e0;
+  color: #a30000;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #ffb3b3;
+}
+
+.retry-button {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.retry-button:hover {
+  background-color: #c9302c;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chart-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.3rem;
+  margin: -10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+.no-data-message {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.example-formats ul {
+  list-style: none;
+  padding: 0;
+}
+
+.example-formats ul li::before {
+  content: "• ";
+  color: #007bff;
+}
+
+.insights-section {
+  width: 225px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.insight-card {
+  margin-bottom: 2rem;
+}
+
+.insight-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.insight-content p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.quick-stats {
+  margin-top: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  background-color: #f1f1f1;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
