@@ -12,8 +12,9 @@ const LoginSignup = ({ setShowLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = "http://localhost:8000"; // Adjust this URL as needed
-    const newurl = currState === "Sign Up" ? url+"/api/user/register" : url+"/api/user/login";
+    const API = import.meta.env.VITE_API_BASE_URL;
+    const newurl = currState === "Sign Up" ? `${API}/api/user/register` : `${API}/api/user/login`;
+
 
     try {
       const res = await axios.post(newurl, {

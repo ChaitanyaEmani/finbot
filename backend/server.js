@@ -1,34 +1,35 @@
 import express from 'express';
 import cors from 'cors';
-import connectDB from './config/db.js';
-import userRouter from './routes/userRoute.js';
 import dotenv from 'dotenv';
-import chatRouter from './routes/chatRoute.js';
-import financeRouter from './routes/financeRoute.js';
+import connectDB from './config/db.js';
+import userRoutes from './routes/userRoute.js';
+import chatRoutes from './routes/chatRoute.js';
+import financeRoutes from './routes/financeRoute.js';
+
 dotenv.config();
-
-
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-app.use(express.json());
-app.use(cors());
-
-
-// db connection
 connectDB();
 
-// api endpoints
-app.use('/api/user',userRouter);
-app.use('/api/chat',chatRouter);
-app.use('/api',financeRouter);
+const app = express();
 
-app.get('/',(req,res)=>{
-    res.send("Welcome to the backend server!");
-})
+// ✅ CORS Middleware — allow requests from frontend
+app.use(cors({
+  origin: 'http://localhost:5173', // Change this to your frontend URL in production
+  credentials: true,
+}));
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log('OPENROUTER_API_KEY:', process.env.OPENROUTER_API_KEY ? 'Loaded' : 'Missing');
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Routes
+app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/finance', financeRoutes);
+
+// Root route
+app.get('/', (req, res) => {
+  res.send('API is running...');
 });
 
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

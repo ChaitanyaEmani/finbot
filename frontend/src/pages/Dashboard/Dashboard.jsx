@@ -6,8 +6,10 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import FinanceDashboard from "../../components/FinanceDashboard/FinanceDashboard";
 import MarkdownRenderer from "../../components/MarkDownRenderer";
+
 const Dashboard = () => {
   // All chat sessions (each with id, title, and messages)
+  const API = import.meta.env.VITE_API_BASE_URL;
   const [chatSessions, setChatSessions] = useState([
     {
       id: "init",
@@ -85,7 +87,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:8000/api/finance",
+        `${API}/api/finance`,
         {
           income: data.income || 0,
           expenses: data.expenses || 0,
@@ -157,7 +159,7 @@ const Dashboard = () => {
           // Send message to backend to get business ideas and investment tips
           const token = localStorage.getItem("token");
           const res = await axios.post(
-            "http://localhost:8000/api/chat/message",
+            `${API}/api/chat/message`,
             { message: userMessage },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -197,7 +199,7 @@ const Dashboard = () => {
       // Non-financial query → send to AI
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:8000/api/chat/message",
+        `${API}/api/chat/message`,
         { message: userMessage },
         { headers: { Authorization: `Bearer ${token}` } }
       );
