@@ -77,9 +77,4 @@ Frontend
     npm run dev
 
 
-🧠 How It Works
-When a user sends a message, it’s forwarded to OpenRouter's LLMs.
 
-The response is saved in MongoDB tied to that user's session.
-
-Old conversations appear in the sidebar for easy access.
