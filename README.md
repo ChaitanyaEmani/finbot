@@ -4,6 +4,8 @@ FinBot is an AI-powered chatbot that helps users manage and understand their per
 
 ---
 
+Live Demo: https://finbot-ten.vercel.app/
+
 ## 🚀 Features
 
 - 🔐 User Authentication (Signup/Login) with JWT
@@ -73,7 +75,7 @@ Frontend
 
     cd frontend
     npm run dev
-Visit: https://finbot-ten.vercel.app/
+
 
 🧠 How It Works
 When a user sends a message, it’s forwarded to OpenRouter's LLMs.
