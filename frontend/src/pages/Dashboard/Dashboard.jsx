@@ -1,5 +1,3 @@
-// Dashboard.jsx
-
 import React, { useEffect, useRef, useState } from "react";
 import "./Dashboard.css";
 import axios from "axios";
@@ -8,54 +6,75 @@ import FinanceDashboard from "../../components/FinanceDashboard/FinanceDashboard
 import MarkdownRenderer from "../../components/MarkDownRenderer";
 
 const Dashboard = () => {
-  // All chat sessions (each with id, title, and messages)
   const API = import.meta.env.VITE_API_BASE_URL;
-  const [chatSessions, setChatSessions] = useState([
-    {
-      id: "init",
-      title: "Welcome Chat",
-      messages: [
-        { role: "bot", message: "Hi, I'm FinBot! How can I assist you today?" },
-      ],
-    },
-  ]);
 
-  // Currently active chat id
-  const [activeChatId, setActiveChatId] = useState("init");
+  // Load from localStorage or default
+  const getInitialChatSessions = () => {
+    const saved = localStorage.getItem("chatSessions");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            id: "init",
+            title: "Welcome Chat",
+            messages: [
+              {
+                role: "bot",
+                message: "Hi, I'm FinBot! How can I assist you today?",
+              },
+            ],
+          },
+        ];
+  };
 
-  // Current input text for the active chat
+  const getInitialActiveChatId = () => {
+    return localStorage.getItem("activeChatId") || "init";
+  };
+
+  const [chatSessions, setChatSessions] = useState(getInitialChatSessions);
+  const [activeChatId, setActiveChatId] = useState(getInitialActiveChatId);
   const [input, setInput] = useState("");
-
-  // Loading state for chat
   const [isLoading, setIsLoading] = useState(false);
-
-  // Ref for scrolling chat messages
   const messagesEndRef = useRef(null);
-
-  // Ref for input field to maintain focus
   const inputRef = useRef(null);
-
-  // State to trigger finance data refresh
   const [financeDataUpdated, setFinanceDataUpdated] = useState(false);
 
-  // Scroll to bottom whenever active chat messages change
+  const activeChat = chatSessions.find((chat) => chat.id === activeChatId);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
   }, [chatSessions, activeChatId]);
 
-  // Focus input when switching chats
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, [activeChatId]);
 
-  // Get messages of active chat session
-  const activeChat = chatSessions.find((chat) => chat.id === activeChatId);
+  useEffect(() => {
+    localStorage.setItem("chatSessions", JSON.stringify(chatSessions));
+  }, [chatSessions]);
 
-  // Function to extract financial data from natural language
+  useEffect(() => {
+    localStorage.setItem("activeChatId", activeChatId);
+  }, [activeChatId]);
+
+  const autoResizeTextarea = () => {
+    if (inputRef.current) {
+      const textarea = inputRef.current;
+      textarea.style.height = "auto";
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 44), 200);
+      textarea.style.height = `${newHeight}px`;
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+    autoResizeTextarea();
+  };
+
   const extractFinancialData = (message) => {
     const patterns = {
       income:
@@ -66,7 +85,6 @@ const Dashboard = () => {
     };
 
     const extracted = {};
-
     for (const [key, pattern] of Object.entries(patterns)) {
       const match = message.match(pattern);
       if (match) {
@@ -74,7 +92,6 @@ const Dashboard = () => {
       }
     }
 
-    // If savings not explicitly mentioned but income and expenses are, calculate it
     if (extracted.income && extracted.expenses && !extracted.savings) {
       extracted.savings = extracted.income - extracted.expenses;
     }
@@ -82,7 +99,6 @@ const Dashboard = () => {
     return Object.keys(extracted).length > 0 ? extracted : null;
   };
 
-  // Function to save financial data
   const saveFinancialData = async (data) => {
     try {
       const token = localStorage.getItem("token");
@@ -96,7 +112,7 @@ const Dashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setFinanceDataUpdated((prev) => !prev); // Trigger refresh in FinanceDashboard
+      setFinanceDataUpdated((prev) => !prev);
       return true;
     } catch (error) {
       console.error("Error saving financial data:", error);
@@ -104,7 +120,6 @@ const Dashboard = () => {
     }
   };
 
-  // Send message handler
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -120,11 +135,11 @@ const Dashboard = () => {
     );
 
     setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
     setIsLoading(true);
 
     try {
       const isGreeting = /^(hi|hello|hey)\b/i.test(userMessage);
-
       if (isGreeting) {
         const greetingReply = {
           role: "bot",
@@ -143,21 +158,18 @@ const Dashboard = () => {
 
       let financialData = extractFinancialData(userMessage);
 
-      // Also try parsing as JSON
       try {
         const jsonData = JSON.parse(userMessage);
         if (jsonData.income || jsonData.expenses || jsonData.savings) {
           financialData = jsonData;
         }
-      } catch (e) {
-        // not JSON, ignore
-      }
+      } catch (_) {}
+
+      const token = localStorage.getItem("token");
 
       if (financialData) {
         const saved = await saveFinancialData(financialData);
         if (saved) {
-          // Send message to backend to get business ideas and investment tips
-          const token = localStorage.getItem("token");
           const res = await axios.post(
             `${API}/api/chat/message`,
             { message: userMessage },
@@ -167,6 +179,7 @@ const Dashboard = () => {
           const botReply =
             res.data.reply ||
             "Your data was saved, but I couldn't fetch suggestions.";
+
           const confirmationMessage = {
             role: "bot",
             message: `✅ I've recorded your financial data:\n\n${
@@ -191,13 +204,12 @@ const Dashboard = () => {
                 : chat
             )
           );
+
           setIsLoading(false);
           return;
         }
       }
 
-      // Non-financial query → send to AI
-      const token = localStorage.getItem("token");
       const res = await axios.post(
         `${API}/api/chat/message`,
         { message: userMessage },
@@ -233,7 +245,6 @@ const Dashboard = () => {
     }
   };
 
-  // Send on Enter key press
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -241,12 +252,8 @@ const Dashboard = () => {
     }
   };
 
-  // Handle click on previous chat in sidebar
-  const handleChatClick = (id) => {
-    setActiveChatId(id);
-  };
+  const handleChatClick = (id) => setActiveChatId(id);
 
-  // Create new chat session
   const handleNewChat = () => {
     const newChatId = uuidv4();
     const newChat = {
@@ -265,9 +272,15 @@ const Dashboard = () => {
     setInput("");
   };
 
-  // Remove duplicates by id (just in case)
+  const handleClearChats = () => {
+    localStorage.removeItem("chatSessions");
+    localStorage.removeItem("activeChatId");
+    window.location.reload();
+  };
+
   const uniqueChats = chatSessions.filter(
-    (chat, index, self) => index === self.findIndex((c) => c.id === chat.id)
+    (chat, index, self) =>
+      index === self.findIndex((c) => c.id === chat.id)
   );
 
   return (
@@ -276,6 +289,9 @@ const Dashboard = () => {
       <div className="sidebar">
         <button className="new-chat" onClick={handleNewChat}>
           + New Chat
+        </button>
+        <button className="clear-chat" onClick={handleClearChats}>
+          🗑️ Clear Chats
         </button>
         <div className="chat-history">
           <p>Previous Chats</p>
@@ -326,16 +342,16 @@ const Dashboard = () => {
 
         <div className="input-container">
           <div className="input-textarea">
-            <input
+            <textarea
               ref={inputRef}
               className="chat-input"
-              type="text"
-              placeholder="Ask me anything or share your financial data... (e.g., 'This month I earned 50,000, spent 32,000')"
+              placeholder="Ask me anything or share your financial data..."
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               disabled={isLoading}
               autoFocus
+              rows={1}
             />
             <button
               className="send-button"
@@ -348,7 +364,7 @@ const Dashboard = () => {
           <div className="input-hint">
             <small>
               💡 Tip: You can share financial data like "I earned 50000, spent
-              30000" or use JSON format
+              30000" or use JSON format. Press Shift+Enter for new lines.
             </small>
           </div>
         </div>

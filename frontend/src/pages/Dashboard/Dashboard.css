@@ -2,8 +2,8 @@
 .dashboard {
   display: flex;
   height: 100vh;
-  overflow: hidden; /* This prevents the whole page from scrolling if content overflows */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  /* font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif; */
 }
 
 /* Sidebar (No changes needed here related to the input issue) */
@@ -27,6 +27,16 @@
   margin-bottom: 16px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.clear-chat{
+  background-color: rgb(200, 34, 34);
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  color: white;
+  margin-bottom: 15px;
 }
 
 .sidebar .chat-history {
@@ -68,8 +78,7 @@
   border-left: 1px solid #e5e7eb;
   border-right: 1px solid #e5e7eb;
   background-color: #f9fafb;
-  /* Remove position: relative; if you are not using absolute positioning for children */
-  /* min-height: 0; (This is good to keep if you have potential shrinking issues, though often not strictly needed with flex: 1 on children) */
+  min-height: 0;
 }
 
 /* Chat messages area - This is the primary scrollable content */
@@ -81,8 +90,6 @@
   min-height: 0; /* Prevents overflow issues in some browsers when content is too large */
   display: flex;
   flex-direction: column; /* Keeps message bubbles aligned as columns */
-  /* Remove padding-bottom that was added for absolute positioning */
-  /* padding-bottom: 90px; */
 }
 
 /* Individual message bubble (No changes needed) */
@@ -141,20 +148,15 @@
   padding: 10px 20px;
   border-top: 1px solid #e5e7eb;
   background-color: white;
-  flex-shrink: 0; /* IMPORTANT: Prevents the input area from shrinking or growing */
   z-index: 10;
-  /* Remove any absolute positioning properties here if you added them */
-  /* position: absolute; */
-  /* bottom: 0; */
-  /* left: 0; */
-  /* right: 0; */
-  /* box-shadow: 0 -2px 5px rgba(0,0,0,0.05); */
+  /* Removed max-height to allow for dynamic growth */
 }
 
 .input-textarea {
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-end; /* Changed from center to flex-end to align with bottom of textarea */
+  /* Removed max-height to allow for dynamic growth */
 }
 
 .chat-input {
@@ -163,7 +165,20 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 15px;
-  min-height: 20px;
+  font-family: inherit; /* Inherit font family from parent */
+  line-height: 1.5;
+  resize: none; /* Prevent manual resizing */
+  overflow-y: auto; /* Allow scrolling if content exceeds max height */
+  min-height: 30px; /* Minimum height for 1 line */
+  max-height: 200px; /* Maximum height for approximately 5 lines */
+  transition: height 0.1s ease-out; /* Smooth transition when height changes */
+  box-sizing: border-box;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #050608;
+  box-shadow: 0 0 0 1px #07080a;
 }
 
 .send-button {
@@ -174,11 +189,17 @@
   border-radius: 8px;
   cursor: pointer;
   flex-shrink: 0;
+  height: 44px; /* Fixed height to match minimum input height */
+  align-self: flex-end; /* Align to bottom of flex container */
 }
 
 .send-button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
+}
+
+.send-button:hover:not(:disabled) {
+  background-color: #059669;
 }
 
 .input-hint {
@@ -195,7 +216,7 @@
   overflow-y: auto;
 }
 
-/* Additional mobile responsiveness (No changes needed) */
+/* Additional mobile responsiveness */
 @media (max-width: 768px) {
   .dashboard {
     flex-direction: column;
@@ -209,5 +230,9 @@
     width: 100%;
     height: auto;
     max-height: 300px;
+  }
+  
+  .chat-input {
+    max-height: 120px; /* Reduce max height on mobile */
   }
 }

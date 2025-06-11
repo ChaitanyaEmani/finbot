@@ -11,20 +11,17 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS Middleware — allow requests from frontend
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://finbot-ten.vercel.app'], // ✅ no trailing slash
+  origin: ['http://localhost:5173', 'https://finbot-ten.vercel.app'],
   credentials: true,
 }));
 
-app.use(express.json()); // Middleware to parse JSON bodies
+app.use(express.json());
 
-// Routes
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api', financeRoutes);
 
-// Root route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });

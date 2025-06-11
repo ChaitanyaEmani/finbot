@@ -1,25 +1,22 @@
 import userModel from '../models/userModel.js';
 import dotenv from 'dotenv';
+import Chat from '../models/chatModel.js';
 dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // System prompt for FinBot (finance expert)
-const finBotPrompt = `You are FinBot, a friendly and helpful AI assistant specializing in personal finance, but you can also have normal conversations and provide code examples.
+const finBotPrompt = `You are FinBot, a friendly and helpful AI assistant specializing in personal finance, but you can also have normal conversations.
 
 Your capabilities:
 - Provide financial advice, budgeting tips, and investment suggestions
 - Help with financial calculations and planning
 - Answer general questions and have friendly conversations
-- Provide code examples when requested
 - Be encouraging and supportive
 - Explain complex financial concepts in simple terms
+- Don't provide code examples or programming help
+- Always respond in a friendly, professional tone
 
-IMPORTANT FORMATTING RULES:
-- When providing ANY code (Python, JavaScript, etc.), ALWAYS format it in proper code blocks using triple backticks
-- Use this format: \`\`\`python\n[your code here]\n\`\`\`
-- NEVER provide code inline within explanatory text
-- Always separate code from explanations
 
 When users share financial data (income, expenses, savings), acknowledge it positively and provide relevant insights.
 For general questions or greetings, respond naturally and conversationally.
@@ -38,11 +35,21 @@ Follow these rules:
 function isFinancialQuery(message) {
   const financialKeywords = [
     'budget', 'expense', 'saving', 'money', 'income',
-    'invest', 'investment', 'loan', 'debt', 'stock', 'retirement', 'insurance'
+    'invest', 'investment', 'loan', 'debt', 'stock', 'retirement', 
+    'insurance', 'earnings', 'financial', 'tax', 'credit',
+     'mortgage', 'pension', 'wealth', 'portfolio', 'dividend',
+      'interest','spending', 'financial planning', 'financial advice', 
+      'financial goal', 'trading', 'financial literacy', 'financial education',
+    'business', 'stocks', 'bonds', 'mutual funds', 'real estate', 'financial market',
+    'stock market', 'cryptocurrency', 'forex', 'financial analysis', 'financial report',
+    'financial statement', 'financial planning', 'financial management', 'financial advisor',
+    'financial consultant', 'financial coach', 'financial literacy', 'financial education',
+    'financial freedom', 'financial independence', 'financial security', 'financial stability'
   ];
   const lowerMessage = message.toLowerCase();
   return financialKeywords.some(keyword => lowerMessage.includes(keyword));
 }
+
 
 // 📤 Send message to the AI model
 export const sendMessageToBot = async (req, res) => {
@@ -61,7 +68,7 @@ export const sendMessageToBot = async (req, res) => {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct:free",
+        model: "openai/gpt-3.5-turbo",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
@@ -74,16 +81,13 @@ export const sendMessageToBot = async (req, res) => {
     if (!response.ok) {
       const errorDetails = await response.text();
       console.error('OpenRouter API Error:', errorDetails);
-
       const fallbackReply = getFallbackResponse(message);
       await saveChat(userId, message, fallbackReply);
-
       return res.status(200).json({ reply: fallbackReply });
     }
 
     const data = await response.json();
     const botReply = data.choices[0]?.message?.content || getFallbackResponse(message);
-
     await saveChat(userId, message, botReply);
 
     res.status(200).json({ reply: botReply });
@@ -200,5 +204,43 @@ export const deleteAllChats = async (req, res) => {
   } catch (err) {
     console.error("Delete Chat Error:", err);
     res.status(500).json({ success: false, message: "Error deleting chats" });
+  }
+};
+
+
+export const createChatSession = async (req, res) => {
+  try {
+    const { chatId, title, messages } = req.body;
+
+    const newChat = new Chat({
+      userId: req.user._id,
+      chatId,
+      title,
+      messages
+    });
+
+    await newChat.save();
+    res.status(201).json(newChat);
+  } catch (error) {
+    console.error("Create Chat Session Error:", error);
+    res.status(500).json({ error: 'Failed to create chat session' });
+  }
+};
+
+// ✅ New: Update existing chat session with new messages
+export const updateChatSession = async (req, res) => {
+  try {
+    const { chatId, newMessages } = req.body;
+
+    const chat = await Chat.findOne({ userId: req.user._id, chatId });
+    if (!chat) return res.status(404).json({ error: 'Chat not found' });
+
+    chat.messages.push(...newMessages);
+    await chat.save();
+
+    res.json(chat);
+  } catch (error) {
+    console.error("Update Chat Session Error:", error);
+    res.status(500).json({ error: 'Failed to update chat session' });
   }
 };
