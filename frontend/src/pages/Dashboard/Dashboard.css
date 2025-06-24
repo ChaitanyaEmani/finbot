@@ -6,6 +6,17 @@
   /* font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif; */
 }
 
+.close-button{
+  padding: 10px 20px;
+  border-radius: 2px;
+  margin: 8px;
+  background: transparent;
+  outline: none;
+  border: 1px solid #000;
+  font-size: 20px;
+  cursor: pointer;
+}
+
 /* Sidebar (No changes needed here related to the input issue) */
 .sidebar {
   width: 220px;

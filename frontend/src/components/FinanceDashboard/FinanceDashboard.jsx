@@ -272,7 +272,10 @@ Format the response clearly with markdown numbered lists.
           <div className="quick-stats">
             <h4>📋 Quick Stats</h4>
             <div className="stats-grid">
-              <div className="stat-item"><span className="stat-label">Total Records</span><span className="stat-value">{financeData.length}</span></div>
+              <div className="stat-item">
+                <span className="stat-label">Total Records</span>
+                <span className="stat-value">{financeData.length}</span>
+              </div>
               <div className="stat-item"><span className="stat-label">Latest Income</span><span className="stat-value">{formatCurrency(financeData.at(-1)?.income || 0)}</span></div>
               <div className="stat-item"><span className="stat-label">Latest Expenses</span><span className="stat-value">{formatCurrency(financeData.at(-1)?.expenses || 0)}</span></div>
               <div className="stat-item"><span className="stat-label">Latest Savings</span><span className="stat-value">{formatCurrency(financeData.at(-1)?.savings || 0)}</span></div>

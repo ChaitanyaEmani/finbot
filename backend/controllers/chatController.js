@@ -4,6 +4,7 @@ import Chat from '../models/chatModel.js';
 dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const userRequestQueues = new Map(); // userId => queue array
 
 // System prompt for FinBot (finance expert)
 const finBotPrompt = `You are FinBot, a friendly and helpful AI assistant specializing in personal finance, but you can also have normal conversations.
@@ -50,55 +51,97 @@ function isFinancialQuery(message) {
   return financialKeywords.some(keyword => lowerMessage.includes(keyword));
 }
 
+function enqueueUserRequest(userId, task) {
+  if (!userRequestQueues.has(userId)) {
+    userRequestQueues.set(userId, []);
+  }
 
-// 📤 Send message to the AI model
+  const queue = userRequestQueues.get(userId);
+  queue.push(task);
+
+  if (queue.length === 1) {
+    processQueue(userId);
+  }
+}
+
+async function processQueue(userId) {
+  const queue = userRequestQueues.get(userId);
+  if (!queue || queue.length === 0) return;
+
+  const task = queue[0];
+  await task(); // wait for current task to finish
+
+  queue.shift(); // remove completed task
+  if (queue.length > 0) {
+    processQueue(userId); // process next
+  } else {
+    userRequestQueues.delete(userId); // clean up
+  }
+}
+
+
+// ✅ Add this near the top of your file (after imports and prompts)
+async function sendRequestWithRetry(apiRequest, retries = 3, delayMs = 1000) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    const response = await apiRequest();
+
+    if (response.status === 429) {
+      console.warn(`Rate limit hit. Retrying in ${delayMs}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2; // Exponential backoff
+    } else {
+      return response;
+    }
+  }
+  throw new Error('Rate limit exceeded after retries');
+}
+
+// 🧠 Then inside your sendMessageToBot function:
 export const sendMessageToBot = async (req, res) => {
   const { message } = req.body;
   const userId = req.user?._id;
 
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-  try {
-    const systemPrompt = isFinancialQuery(message) ? finBotPrompt : generalPrompt;
+  enqueueUserRequest(userId, async () => {
+    try {
+      const systemPrompt = isFinancialQuery(message) ? finBotPrompt : generalPrompt;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
+      const response = await sendRequestWithRetry(() =>
+        fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${OPENROUTER_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: message }
+            ],
+            temperature: 0.7,
+            max_tokens: 500
+          })
+        })
+      );
 
-    if (!response.ok) {
-      const errorDetails = await response.text();
-      console.error('OpenRouter API Error:', errorDetails);
+      const data = await response.json();
+      const botReply = data.choices[0]?.message?.content || getFallbackResponse(message);
+      await saveChat(userId, message, botReply);
+
+      res.status(200).json({ reply: botReply });
+
+    } catch (error) {
+      console.error('Server Error:', error);
       const fallbackReply = getFallbackResponse(message);
       await saveChat(userId, message, fallbackReply);
-      return res.status(200).json({ reply: fallbackReply });
+      res.status(200).json({ reply: fallbackReply });
     }
-
-    const data = await response.json();
-    const botReply = data.choices[0]?.message?.content || getFallbackResponse(message);
-    await saveChat(userId, message, botReply);
-
-    res.status(200).json({ reply: botReply });
-
-  } catch (error) {
-    console.error('Server Error:', error);
-    const fallbackReply = getFallbackResponse(message);
-    await saveChat(userId, message, fallbackReply);
-    res.status(200).json({ reply: fallbackReply });
-  }
+  });
 };
+
+
 
 // 🧠 Save both user and bot messages
 async function saveChat(userId, userMessage, botReply) {

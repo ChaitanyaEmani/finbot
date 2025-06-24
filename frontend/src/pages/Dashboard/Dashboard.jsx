@@ -8,7 +8,6 @@ import MarkdownRenderer from "../../components/MarkDownRenderer";
 const Dashboard = () => {
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  // Load from localStorage or default
   const getInitialChatSessions = () => {
     const saved = localStorage.getItem("chatSessions");
     return saved
@@ -35,6 +34,7 @@ const Dashboard = () => {
   const [activeChatId, setActiveChatId] = useState(getInitialActiveChatId);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showFinanceOverlay, setShowFinanceOverlay] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const [financeDataUpdated, setFinanceDataUpdated] = useState(false);
@@ -113,6 +113,7 @@ const Dashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setFinanceDataUpdated((prev) => !prev);
+      setShowFinanceOverlay(true);
       return true;
     } catch (error) {
       console.error("Error saving financial data:", error);
@@ -270,6 +271,7 @@ const Dashboard = () => {
     setChatSessions((prev) => [...prev, newChat]);
     setActiveChatId(newChatId);
     setInput("");
+    setShowFinanceOverlay(false);
   };
 
   const handleClearChats = () => {
@@ -285,94 +287,85 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* Sidebar */}
       <div className="sidebar">
-        <button className="new-chat" onClick={handleNewChat}>
-          + New Chat
-        </button>
-        <button className="clear-chat" onClick={handleClearChats}>
-          🗑️ Clear Chats
-        </button>
+        <button className="new-chat" onClick={handleNewChat}>+ New Chat</button>
+        <button className="clear-chat" onClick={handleClearChats}>🗑️ Clear Chats</button>
         <div className="chat-history">
           <p>Previous Chats</p>
           <ul>
-            {[...uniqueChats]
-              .slice()
-              .reverse()
-              .map((chat) => (
-                <li
-                  key={chat.id}
-                  onClick={() => handleChatClick(chat.id)}
-                  className={chat.id === activeChatId ? "active-chat" : ""}
-                >
-                  {chat.title}
-                </li>
-              ))}
+            {[...uniqueChats].slice().reverse().map((chat) => (
+              <li
+                key={chat.id}
+                onClick={() => handleChatClick(chat.id)}
+                className={chat.id === activeChatId ? "active-chat" : ""}
+              >
+                {chat.title}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      {/* Chat Area */}
       <div className="chat-area">
-        <div className="chat-messages" ref={messagesEndRef}>
-          {activeChat?.messages.map((msg, idx) => (
-            <div key={idx} className={`chat-bubble ${msg.role}`}>
-              <div className="message-content">
-                {msg.role === "bot" ? (
-                  <MarkdownRenderer content={msg.message} />
-                ) : (
-                  msg.message
-                )}
-              </div>
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="chat-bubble bot loading">
-              <div className="message-content">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+        {showFinanceOverlay ? (
+          <div className="overlay-dashboard full">
+            <button className="close-button" onClick={() => setShowFinanceOverlay(false)}>X</button>
+            <FinanceDashboard refreshTrigger={financeDataUpdated} />
+          </div>
+        ) : (
+          <>
+            <div className="chat-messages" ref={messagesEndRef}>
+              {activeChat?.messages.map((msg, idx) => (
+                <div key={idx} className={`chat-bubble ${msg.role}`}>
+                  <div className="message-content">
+                    {msg.role === "bot" ? (
+                      <MarkdownRenderer content={msg.message} />
+                    ) : (
+                      msg.message
+                    )}
+                  </div>
                 </div>
+              ))}
+              {isLoading && (
+                <div className="chat-bubble bot loading">
+                  <div className="message-content">
+                    <div className="typing-indicator">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="input-container">
+              <div className="input-textarea">
+                <textarea
+                  ref={inputRef}
+                  className="chat-input"
+                  placeholder="Ask me anything or share your financial data..."
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  disabled={isLoading}
+                  autoFocus
+                  rows={1}
+                />
+                <button
+                  className="send-button"
+                  onClick={handleSend}
+                  disabled={isLoading || !input.trim()}
+                >
+                  {isLoading ? "..." : "Send"}
+                </button>
+              </div>
+              <div className="input-hint">
+                <small>
+                  💡 Tip: You can share financial data like "I earned 50000, spent 30000" or use JSON format. Press Shift+Enter for new lines.
+                </small>
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="input-container">
-          <div className="input-textarea">
-            <textarea
-              ref={inputRef}
-              className="chat-input"
-              placeholder="Ask me anything or share your financial data..."
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={isLoading}
-              autoFocus
-              rows={1}
-            />
-            <button
-              className="send-button"
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-            >
-              {isLoading ? "..." : "Send"}
-            </button>
-          </div>
-          <div className="input-hint">
-            <small>
-              💡 Tip: You can share financial data like "I earned 50000, spent
-              30000" or use JSON format. Press Shift+Enter for new lines.
-            </small>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Panel */}
-      <div className="right-panel">
-        <FinanceDashboard refreshTrigger={financeDataUpdated} />
+          </>
+        )}
       </div>
     </div>
   );
