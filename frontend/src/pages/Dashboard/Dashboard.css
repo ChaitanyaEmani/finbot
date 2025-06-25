@@ -1,33 +1,17 @@
-/* Overall layout */
 .dashboard {
   display: flex;
-  height: 100vh;
-  
-  /* font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif; */
+  height: 100vh;  
 }
 
-.close-button{
-  padding: 10px 20px;
-  border-radius: 2px;
-  margin: 8px;
-  background: transparent;
-  outline: none;
-  border: 1px solid #000;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* Sidebar (No changes needed here related to the input issue) */
 .sidebar {
-  width: 220px;
-  background-color: #ededed;
-  color: #000;
+  width: 250px;
+  height: 100vh;
+  background-color: #ffffff;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  box-sizing: border-box;
   overflow-y: auto;
-  font-weight: 300;
+  transition: transform 0.3s ease;
 }
 
 .sidebar .new-chat {
@@ -35,19 +19,20 @@
   color: white;
   border: none;
   padding: 10px;
+  margin-top: 30px;
   margin-bottom: 16px;
   border-radius: 6px;
   cursor: pointer;
 }
 
-.clear-chat{
+.clear-chat {
   background-color: rgb(200, 34, 34);
   padding: 8px;
   border-radius: 6px;
   border: none;
-  outline: none;
   color: white;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .sidebar .chat-history {
@@ -79,6 +64,18 @@
 
 .sidebar .active-chat {
   background-color: #2563eb;
+  color: white;
+}
+
+/* Close icon inside sidebar */
+.sidebar .close-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #000;
+  z-index: 1001;
 }
 
 /* Chat area - CRITICAL: Sets up the main chat section as a flex column */
@@ -90,12 +87,16 @@
   border-right: 1px solid #e5e7eb;
   background-color: #f9fafb;
   min-height: 0;
+  height: 100vh; /* Ensure it takes full viewport height */
+  overflow: hidden; /* Prevent overflow on the container */
+  position: relative; /* Add this for proper positioning context */
 }
 
 /* Chat messages area - This is the primary scrollable content */
 .chat-messages {
   flex: 1; /* IMPORTANT: This makes it grow to fill remaining vertical space and be the scrollable area */
   padding: 20px;
+  padding-bottom: 20px; /* Reduce padding since input is now properly positioned */
   overflow-y: auto; /* IMPORTANT: This makes the chat messages scrollable when they exceed height */
   scroll-behavior: smooth;
   min-height: 0; /* Prevents overflow issues in some browsers when content is too large */
@@ -154,20 +155,24 @@
   }
 }
 
-/* Input area - CRITICAL: Ensures it stays at its fixed height at the bottom */
+/* Fixed input container positioning - MAJOR CHANGE */
 .input-container {
-  padding: 10px 20px;
+  padding: 15px 20px;
+  position: sticky; /* Changed to sticky for better compatibility */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
   background-color: white;
-  z-index: 10;
-  /* Removed max-height to allow for dynamic growth */
+  margin-top: auto; /* Push to bottom */
 }
 
 .input-textarea {
   display: flex;
   gap: 10px;
   align-items: flex-end; /* Changed from center to flex-end to align with bottom of textarea */
-  /* Removed max-height to allow for dynamic growth */
 }
 
 .chat-input {
@@ -227,23 +232,141 @@
   overflow-y: auto;
 }
 
-/* Additional mobile responsiveness */
+/* Overlay styles for finance dashboard */
+.overlay-dashboard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.overlay-dashboard.full {
+  width: 100%;
+  height: 100%;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1001;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  background-color: #dc2626;
+}
+
+/* Mobile responsiveness - IMPROVED */
 @media (max-width: 768px) {
   .dashboard {
     flex-direction: column;
   }
+
   .sidebar {
-    width: 100%;
-    height: auto;
-    max-height: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 75%;
+    max-width: 260px;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 2000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
   }
-  .right-panel {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
+
+  .sidebar.open {
+    transform: translateX(0);
   }
-  
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+
+  .sidebar .close-icon {
+    display: block;
+  }
+
+  .chat-area {
+    width: 100%;
+    margin-left: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .chat-messages {
+    padding: 15px;
+    padding-bottom: 15px; /* Reduce padding for mobile */
+  }
+
+  .input-container {
+    padding: 12px 15px;
+  }
+
+  .chat-bubble {
+    max-width: 90%; /* Increase max width on mobile */
+    font-size: 14px; /* Slightly smaller font for mobile */
+  }
+
+  .input-hint {
+    font-size: 12px; /* Smaller hint text on mobile */
+  }
+
   .chat-input {
-    max-height: 120px; /* Reduce max height on mobile */
+    font-size: 16px; /* Prevent zoom on iOS */
+    min-height: 40px; /* Slightly larger touch target */
+  }
+
+  .send-button {
+    height: 48px; /* Larger touch target */
+    padding: 12px 18px;
+  }
+}
+
+/* Desktop view (≥769px): sidebar always visible, no close icon */
+@media (min-width: 769px) {
+  .sidebar {
+    transform: translateX(0);
+    position: relative;
+    box-shadow: none;
+  }
+
+  .sidebar .close-icon {
+    display: none;
+  }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 480px) {
+  .chat-messages {
+    padding: 10px;
+    padding-bottom: 10px;
+  }
+
+  .input-container {
+    padding: 10px;
+  }
+
+  .chat-bubble {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .input-hint {
+    font-size: 11px;
+    margin-top: 4px;
   }
 }

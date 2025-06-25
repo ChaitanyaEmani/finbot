@@ -3,9 +3,10 @@ import "./Dashboard.css";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import FinanceDashboard from "../../components/FinanceDashboard/FinanceDashboard";
-import MarkdownRenderer from "../../components/MarkDownRenderer";
+import MarkDownRenderer from "../../components/MarkDownRenderer";
+import { FaTimes } from "react-icons/fa";
 
-const Dashboard = () => {
+const Dashboard = ({ isSidebarOpen, toggleSidebar }) => {
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const getInitialChatSessions = () => {
@@ -287,7 +288,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        <FaTimes className="close-icon" onClick={toggleSidebar} />
         <button className="new-chat" onClick={handleNewChat}>+ New Chat</button>
         <button className="clear-chat" onClick={handleClearChats}>🗑️ Clear Chats</button>
         <div className="chat-history">
@@ -319,7 +321,7 @@ const Dashboard = () => {
                 <div key={idx} className={`chat-bubble ${msg.role}`}>
                   <div className="message-content">
                     {msg.role === "bot" ? (
-                      <MarkdownRenderer content={msg.message} />
+                      <MarkDownRenderer content={msg.message} />
                     ) : (
                       msg.message
                     )}
@@ -335,6 +337,8 @@ const Dashboard = () => {
                   </div>
                 </div>
               )}
+              {/* Add some spacing at the end for better UX */}
+              <div style={{ height: '20px' }} />
             </div>
 
             <div className="input-container">

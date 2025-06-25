@@ -1,32 +1,28 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa"; // added FaTimes
 import "./Navbar.css";
-import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
 
-const Navbar = ({ showLogin }) => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-    window.location.reload(); // optional refresh
-  };
-
-  const isLoggedIn = !!localStorage.getItem("token"); // check if token exists
+const Navbar = ({ showLogin, toggleSidebar, isSidebarOpen }) => {
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <div className={showLogin ? "" : "navbar"}>
       <div className="navbar-container">
+        {/* Toggle icon: hamburger or close */}
+        {isSidebarOpen ? (
+          <FaTimes className="hamburger" onClick={toggleSidebar} />
+        ) : (
+          <FaBars className="hamburger" onClick={toggleSidebar} />
+        )}
+
         <Link to="/" className="logo">
           <h2>FinBot</h2>
         </Link>
 
         {isLoggedIn && (
           <div className="profile-container">
-            <FaUserCircle size={30} color="black" className="profile-icon" />
-            <div className="logout-btn" onClick={handleLogout}>
-              Logout
-            </div>
+            <FaUserCircle size={30} className="profile-icon" />
           </div>
         )}
       </div>
