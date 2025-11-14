@@ -88,4 +88,14 @@ const registerUser = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser };
+const logoutUser = async (req, res) => {
+    // Nothing to do server-side
+    try {
+        res.status(200).json({ success: true, message: "User logged out successfully" });
+    } catch (error) {
+        console.error("Logout Error:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+   
+};
+export { loginUser, registerUser,logoutUser };

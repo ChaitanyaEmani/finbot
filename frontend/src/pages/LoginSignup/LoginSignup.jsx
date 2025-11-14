@@ -25,6 +25,7 @@ const LoginSignup = ({ setShowLogin }) => {
 
       if (res.data.success) {
         // Store token in localStorage
+        console.log(res.data);
         localStorage.setItem("token", res.data.token);
         setShowLogin(false);
         // Optionally redirect to dashboard
@@ -71,14 +72,11 @@ const LoginSignup = ({ setShowLogin }) => {
             required
           />
         </div>
-
-        <button type="submit">{currState === "Sign Up" ? "Sign up" : "Login"}</button>
-
         <div className="login-signup-condition">
-          <input type="checkbox" required />
+          <input type="checkbox" className='cursor-pointer' required />
           <p>By continuing, I agree to the terms of use & privacy policy.</p>
         </div>
-
+        <button type="submit" className='cursor-pointer'>{currState === "Sign Up" ? "Sign up" : "Login"}</button>
         {error && <p className="error">{error}</p>}
 
         {currState === "Sign Up" ? (
