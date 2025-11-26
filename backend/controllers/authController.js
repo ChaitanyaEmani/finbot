@@ -157,7 +157,3 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-
-export const logOut = async (req,res)=>{
-  
-}
