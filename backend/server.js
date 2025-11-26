@@ -16,6 +16,12 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
 
+process.on("uncaughtException", (err) => {
+  console.error("🔥 Uncaught Exception:", err);
+  console.error(err.stack);
+  process.exit(1);
+});
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -51,7 +57,6 @@ app.use(
   })
 );
 
-app.options("*", cors());
 
 // Body parser
 app.use(express.json({ limit: "10mb" }));
@@ -66,14 +71,6 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/analytics", analyticsRoutes);
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    status: "error",
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
 
 // Error handler
 app.use(errorHandler);

@@ -16,7 +16,7 @@ const openRouterClient = axios.create({
   baseURL: 'https://openrouter.ai/api/v1',
   headers: {
     'Content-Type': 'application/json',
-    'HTTP-Referer': process.env.APP_URL || 'http://localhost:5000',
+    'HTTP-Referer': 'https://finbot-g7un.onrender.com' || 'http://localhost:5000',
     'X-Title': 'FinBot Personal Finance Assistant'
   },
   timeout: 90000, // 90 seconds for complete response
