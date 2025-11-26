@@ -1,20 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Outfit', sans-serif;
-  /* overflow: hidden; */
+/* Hide Scrollbar Globally */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
 }
 
-.app{
-  width: 90%;
-  margin: auto;
-  
+html, body {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
 }
 
-a{
-  text-decoration: none;
-  color: inherit;
+body::-webkit-scrollbar {
+  display: none;               /* Chrome/Safari */
 }

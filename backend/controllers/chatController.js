@@ -1,289 +1,190 @@
-import userModel from '../models/userModel.js';
-import dotenv from 'dotenv';
 import Chat from '../models/chatModel.js';
-dotenv.config();
+import openRouterClient from '../config/openrouter.js';
+import { SYSTEM_PROMPT, getFinancialSummary } from '../utils/prompts.js';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const userRequestQueues = new Map(); // userId => queue array
+// @desc    Send message to AI
+// @route   POST /api/chat/send
+// @access  Private
+export const sendMessage = async (req, res) => {
+  try {
+    const { message, chatId } = req.body;
 
-// System prompt for FinBot (finance expert)
-const finBotPrompt = `You are FinBot, a friendly and helpful AI assistant specializing in personal finance, but you can also have normal conversations.
+    // Validate message
+    if (!message || message.trim() === '') {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Message is required'
+      });
+    }
 
-Your capabilities:
-- Provide financial advice, budgeting tips, and investment suggestions
-- Help with financial calculations and planning
-- Answer general questions and have friendly conversations
-- Be encouraging and supportive
-- Explain complex financial concepts in simple terms
-- Don't provide code examples or programming help
-- Always respond in a friendly, professional tone
+    // Validate message length
+    if (message.length > 2000) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Message too long. Maximum 2000 characters allowed.'
+      });
+    }
 
-
-When users share financial data (income, expenses, savings), acknowledge it positively and provide relevant insights.
-For general questions or greetings, respond naturally and conversationally.
-Always be friendly, encouraging, and professional.`;
-
-// System prompt for general assistant (non-financial)
-const generalPrompt = `You are a helpful, conversational AI assistant similar to ChatGPT, Claude, or Gemini. You can explain programming concepts, solve problems, provide examples in Python, JavaScript, or other languages, and chat like a human.
-
-Follow these rules:
-- Format code properly using triple backticks with language hint (e.g., \`\`\`python)
-- Keep explanations clear and concise
-- Be friendly and supportive
-- Respond to non-financial queries without any financial tone`;
-
-// 🔍 Determine if query is financial
-function isFinancialQuery(message) {
-  const financialKeywords = [
-    'budget', 'expense', 'saving', 'money', 'income',
-    'invest', 'investment', 'loan', 'debt', 'stock', 'retirement', 
-    'insurance', 'earnings', 'financial', 'tax', 'credit',
-     'mortgage', 'pension', 'wealth', 'portfolio', 'dividend',
-      'interest','spending', 'financial planning', 'financial advice', 
-      'financial goal', 'trading', 'financial literacy', 'financial education',
-    'business', 'stocks', 'bonds', 'mutual funds', 'real estate', 'financial market',
-    'stock market', 'cryptocurrency', 'forex', 'financial analysis', 'financial report',
-    'financial statement', 'financial planning', 'financial management', 'financial advisor',
-    'financial consultant', 'financial coach', 'financial literacy', 'financial education',
-    'financial freedom', 'financial independence', 'financial security', 'financial stability'
-  ];
-  const lowerMessage = message.toLowerCase();
-  return financialKeywords.some(keyword => lowerMessage.includes(keyword));
-}
-
-function enqueueUserRequest(userId, task) {
-  if (!userRequestQueues.has(userId)) {
-    userRequestQueues.set(userId, []);
-  }
-
-  const queue = userRequestQueues.get(userId);
-  queue.push(task);
-
-  if (queue.length === 1) {
-    processQueue(userId);
-  }
-}
-
-async function processQueue(userId) {
-  const queue = userRequestQueues.get(userId);
-  if (!queue || queue.length === 0) return;
-
-  const task = queue[0];
-  await task(); // wait for current task to finish
-
-  queue.shift(); // remove completed task
-  if (queue.length > 0) {
-    processQueue(userId); // process next
-  } else {
-    userRequestQueues.delete(userId); // clean up
-  }
-}
-
-
-// ✅ Add this near the top of your file (after imports and prompts)
-async function sendRequestWithRetry(apiRequest, retries = 3, delayMs = 1000) {
-  for (let attempt = 0; attempt < retries; attempt++) {
-    const response = await apiRequest();
-
-    if (response.status === 429) {
-      console.warn(`Rate limit hit. Retrying in ${delayMs}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delayMs));
-      delayMs *= 2; // Exponential backoff
+    // Get or create chat
+    let chat;
+    if (chatId) {
+      chat = await Chat.findOne({ _id: chatId, userId: req.user._id });
+      if (!chat) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Chat not found'
+        });
+      }
     } else {
-      return response;
+      chat = await Chat.create({
+        userId: req.user._id,
+        title: message.substring(0, 50),
+        messages: []
+      });
     }
-  }
-  throw new Error('Rate limit exceeded after retries');
-}
 
-// 🧠 Then inside your sendMessageToBot function:
-export const sendMessageToBot = async (req, res) => {
-  const { message } = req.body;
-  const userId = req.user?._id;
+    // Get financial summary (SINGLE CALL - removed duplicate)
+    const financialSummary = await getFinancialSummary(req.user._id);
 
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    // Build messages for AI
+    const messages = [
+      { 
+        role: 'system', 
+        content: `${SYSTEM_PROMPT}\n\nUser's Financial Context:\n${JSON.stringify(financialSummary, null, 2)}` 
+      },
+      ...chat.messages.slice(-10).map(m => ({ 
+        role: m.role, 
+        content: m.content 
+      })),
+      { role: 'user', content: message }
+    ];
 
-  enqueueUserRequest(userId, async () => {
+    // Call OpenRouter API with error handling
+    let response;
     try {
-      const systemPrompt = isFinancialQuery(message) ? finBotPrompt : generalPrompt;
-
-      const response = await sendRequestWithRetry(() =>
-        fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENROUTER_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: message }
-            ],
-            temperature: 0.7,
-            max_tokens: 500
-          })
-        })
-      );
-
-      const data = await response.json();
-      const botReply = data.choices[0]?.message?.content || getFallbackResponse(message);
-      await saveChat(userId, message, botReply);
-
-      res.status(200).json({ reply: botReply });
-
-    } catch (error) {
-      console.error('Server Error:', error);
-      const fallbackReply = getFallbackResponse(message);
-      await saveChat(userId, message, fallbackReply);
-      res.status(200).json({ reply: fallbackReply });
-    }
-  });
-};
-
-
-
-// 🧠 Save both user and bot messages
-async function saveChat(userId, userMessage, botReply) {
-  try {
-    await userModel.findByIdAndUpdate(userId, {
-      $push: { chatData: { sender: 'user', message: userMessage } }
-    });
-
-    await userModel.findByIdAndUpdate(userId, {
-      $push: { chatData: { sender: 'bot', message: botReply } }
-    });
-  } catch (err) {
-    console.error("Error saving chat data:", err);
-  }
-}
-
-// 🔄 Fallback if API fails
-function getFallbackResponse(message) {
-  const lowerMessage = message.toLowerCase();
-
-  if (lowerMessage.includes("python")) {
-    return `Here's a Python example:
-
-\`\`\`python
-def greet(name):
-    return f"Hello, {name}!"
-
-print(greet("Chaitanya"))
-\`\`\`
-
-Let me know if you'd like help building something!`;
-  }
-
-  if (lowerMessage.includes("code") || lowerMessage.includes("javascript")) {
-    return `Sure! Here's an example in JavaScript:
-
-\`\`\`javascript
-function greet(name) {
-  return \`Hello, \${name}!\`;
-}
-
-console.log(greet("Chaitanya"));
-\`\`\`
-
-Let me know what you want help building.`;
-  }
-
-  if (lowerMessage.includes("budget") || lowerMessage.includes("money") || lowerMessage.includes("invest")) {
-    return "To manage your money wisely, start by tracking income and expenses. Would you like a budgeting rule like 50/30/20 or a savings goal suggestion?";
-  }
-
-  if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
-    return "Hi there! 👋 I'm FinBot. I can assist with finance, code, or anything else. Ask away!";
-  }
-
-  return "I'm having trouble connecting right now, but feel free to ask about finances, code, or general queries!";
-}
-
-// 📥 Get previous chats
-export const getPreviousChats = async (req, res) => {
-  const userId = req.user?._id;
-  const { role } = req.query;
-
-  if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
-
-  try {
-    const user = await userModel.findById(userId).select("chatData");
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-    let chats = user.chatData;
-    if (role === 'user' || role === 'bot') {
-      chats = chats.filter(chat => chat.sender === role);
+      response = await openRouterClient.post('/chat/completions', {
+        model: 'qwen/qwen-2.5-72b-instruct',
+        messages,
+        temperature: 0.7,
+        max_tokens: 1000
+      });
+    } catch (apiError) {
+      // Handle rate limiting
+      if (apiError.response?.status === 429) {
+        return res.status(429).json({
+          status: 'error',
+          message: 'Rate limit exceeded. Please try again in a moment.'
+        });
+      }
+      
+      // Handle other API errors
+      console.error('OpenRouter API error:', apiError.response?.data || apiError.message);
+      return res.status(503).json({
+        status: 'error',
+        message: 'AI service temporarily unavailable',
+        details: apiError.response?.data?.error || apiError.message
+      });
     }
 
-    const formattedChats = chats.map(chat => ({
-      ...chat._doc,
-      formattedTime: new Date(chat.timestamp).toLocaleString('en-IN', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', hour12: true
-      })
-    }));
+    const aiResponse = response.data.choices[0].message.content;
 
-    res.status(200).json({ success: true, chatData: formattedChats });
-  } catch (err) {
-    console.error("Fetch Chat Error:", err);
-    res.status(500).json({ success: false, message: "Error fetching chats" });
-  }
-};
-
-// 🗑 Delete all chats
-export const deleteAllChats = async (req, res) => {
-  const userId = req.user?._id;
-  if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
-
-  try {
-    const user = await userModel.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-    user.chatData = [];
-    await user.save();
-
-    res.status(200).json({ success: true, message: "All chats deleted" });
-  } catch (err) {
-    console.error("Delete Chat Error:", err);
-    res.status(500).json({ success: false, message: "Error deleting chats" });
-  }
-};
-
-
-export const createChatSession = async (req, res) => {
-  try {
-    const { chatId, title, messages } = req.body;
-
-    const newChat = new Chat({
-      userId: req.user._id,
-      chatId,
-      title,
-      messages
-    });
-
-    await newChat.save();
-    res.status(201).json(newChat);
-  } catch (error) {
-    console.error("Create Chat Session Error:", error);
-    res.status(500).json({ error: 'Failed to create chat session' });
-  }
-};
-
-// ✅ New: Update existing chat session with new messages
-export const updateChatSession = async (req, res) => {
-  try {
-    const { chatId, newMessages } = req.body;
-
-    const chat = await Chat.findOne({ userId: req.user._id, chatId });
-    if (!chat) return res.status(404).json({ error: 'Chat not found' });
-
-    chat.messages.push(...newMessages);
+    // Save messages to chat
+    chat.messages.push(
+      { role: 'user', content: message },
+      { role: 'assistant', content: aiResponse }
+    );
+    
     await chat.save();
 
-    res.json(chat);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        chatId: chat._id,
+        message: aiResponse,
+        timestamp: new Date()
+      }
+    });
   } catch (error) {
-    console.error("Update Chat Session Error:", error);
-    res.status(500).json({ error: 'Failed to update chat session' });
+    console.error('Chat error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to process your message',
+      details: error.message
+    });
+  }
+};
+
+// @desc    Get chat history
+// @route   GET /api/chat/history
+// @access  Private
+export const getChatHistory = async (req, res) => {
+  try {
+    const { chatId } = req.query;
+
+    if (chatId) {
+      const chat = await Chat.findOne({ _id: chatId, userId: req.user._id });
+      if (!chat) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Chat not found'
+        });
+      }
+      return res.status(200).json({
+        status: 'success',
+        data: { chat }
+      });
+    }
+
+    // Get all chats for user
+    const chats = await Chat.find({ userId: req.user._id })
+      .select('title createdAt updatedAt messages')
+      .sort({ updatedAt: -1 })
+      .limit(20);
+
+    res.status(200).json({
+      status: 'success',
+      results: chats.length,
+      data: { chats }
+    });
+  } catch (error) {
+    console.error('Get chat history error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve chat history',
+      details: error.message
+    });
+  }
+};
+
+// @desc    Delete chat
+// @route   DELETE /api/chat/:id
+// @access  Private
+export const deleteChat = async (req, res) => {
+  try {
+    const chat = await Chat.findOne({
+      _id: req.params.id,
+      userId: req.user._id
+    });
+
+    if (!chat) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Chat not found'
+      });
+    }
+
+    await chat.deleteOne();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Chat deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete chat error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to delete chat',
+      details: error.message
+    });
   }
 };

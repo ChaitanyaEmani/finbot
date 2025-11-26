@@ -1,42 +1,31 @@
-import React, { useState } from 'react'
-import { Routes,Route } from 'react-router-dom'
-import Home from './pages/Home/Home'
-import Dashboard from './pages/Dashboard/Dashboard'
-import Navbar from './components/Navbar/Navbar'
-import LoginSignup from './pages/LoginSignup/LoginSignup'
+// App.jsx
+import React from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import Home from './pages/Home';
+import Budget from './pages/Budget';
+import Chat from './pages/Chat';
+import Transaction from './pages/Transaction';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LoginSignup from './pages/LoginSignup';
+
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
+  const location = useLocation();
+  const isChatPage = location.pathname === '/chat';
   return (
     <>
-      {showLogin && <LoginSignup setShowLogin={setShowLogin} />}
-      <div className="app">
-        <Navbar
-          showLogin={showLogin}
-          isSidebarOpen={isSidebarOpen}
-          toggleSidebar={toggleSidebar}
-        />
-        <Routes>
-          <Route
-            path="/"
-            element={<Home setShowLogin={setShowLogin} />}
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-              />
-            }
-          />
-        </Routes>
-      </div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path='/login-signup' element={<LoginSignup/>}/>
+        <Route path="/budget" element={<Budget />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/transaction" element={<Transaction />}/>
+      </Routes>
+      {!isChatPage && <Footer />}
     </>
   );
 };
 
-export default App
+export default App;

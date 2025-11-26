@@ -1,7 +1,27 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const connectDB = async () => {
-    await mongoose.connect(process.env.MONGO_URL).then(()=>{console.log("MongoDB connected successfully")});
-}
+export const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
 
-export default connectDB;
+    if(conn){
+      console.log("MongoDB connected");
+    }
+    // Connection events
+    mongoose.connection.on('error', (err) => {
+      console.error(`❌ MongoDB connection error: ${err}`);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('⚠️  MongoDB disconnected');
+    });
+
+  } catch (error) {
+    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
+    process.exit(1);
+  }
+};
