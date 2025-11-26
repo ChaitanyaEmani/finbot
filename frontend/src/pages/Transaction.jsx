@@ -25,7 +25,7 @@ const Transaction = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/transactions/all`, {
+      const res = await axios.get(`${API_URL}/api/transactions/all`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

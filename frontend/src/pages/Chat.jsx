@@ -32,7 +32,7 @@ const Chat = () => {
   const fetchChatHistory = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/chat/history`, {
+      const res = await axios.get(`${API_URL}/api/chat/history`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setChats(res.data.data.chats);
@@ -45,7 +45,7 @@ const Chat = () => {
     try {
       setCurrentChatId(chatId);
       const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/chat/history?chatId=${chatId}`, {
+      const res = await axios.get(`${API_URL}/api/chat/history?chatId=${chatId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(res.data.data.chat.messages);
@@ -76,7 +76,7 @@ const Chat = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.post(
-        `${API_URL}/chat/send`,
+        `${API_URL}/api/chat/send`,
         { message: userMessage, chatId: currentChatId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -125,7 +125,7 @@ const Chat = () => {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/chat/${chatId}`, {
+      await axios.delete(`${API_URL}/api/chat/${chatId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

@@ -79,7 +79,7 @@ export default function LoginSignupPage() {
     }
 
     // API CALL
-    const res = await axios.post(`${API_URL}/auth/${endpoint}`, payload);
+    const res = await axios.post(`${API_URL}/api/auth/${endpoint}`, payload);
 
     // Save token + user
     localStorage.setItem("token", res.data.data.token);

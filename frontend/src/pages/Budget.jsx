@@ -9,7 +9,7 @@ const Budget = () => {
      const fetchCurrentBudgets = async ()=>{
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_URL}/budget/current`,{
+        const res = await axios.get(`${API_URL}/api/budget/current`,{
           headers:{
             Authorization:`Bearer ${token}`
           }
@@ -23,7 +23,7 @@ const Budget = () => {
 
      fetchCurrentBudgets();
   },[]);
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
