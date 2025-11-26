@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation,useNavigate } from 'react-router-dom';
 import { Wallet } from 'lucide-react';
-import Modal from './Modal';
-import LoginSignup from '../pages/LoginSignup';
 
 
 const Navbar = () => {
   const location = useLocation();
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   // Listen for auth changes
   useEffect(() => {
@@ -32,11 +29,7 @@ const Navbar = () => {
     window.location.href = "/";
   };
 
-  const handleModalClose = () => {
-    setModalOpen(false);
-    // Check token again when modal closes
-    setToken(localStorage.getItem("token"));
-  };
+
 
   return (
     <>

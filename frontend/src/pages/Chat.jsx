@@ -232,9 +232,6 @@ const Chat = () => {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 rounded-2xl mb-6">
-                  <Bot className="w-12 h-12 text-white" />
-                </div>
                 <h2 className="text-2xl font-bold text-white mb-3">Welcome to Your AI Financial Assistant</h2>
                 <p className="text-gray-400 max-w-md mb-6">
                   I'm here to help you manage your finances, analyze spending patterns, and provide personalized financial advice.

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, DollarSign, Filter, Search, TrendingUp, TrendingDown, Download, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Calendar, DollarSign, Search, TrendingUp, TrendingDown, Plus, Edit2, Trash2, X } from 'lucide-react';
+import Modal from '../components/Modal';
 import axios from 'axios';
 const Transaction = () => {
   const API_URL = import.meta.env.VITE_BASE_API_URL;
@@ -16,15 +17,26 @@ const Transaction = () => {
     pages: 1,
     total: 0
   });
+  const today = new Date().toISOString().split("T")[0];  
+  // result example: "2025-11-27"
 
+  const [formData, setFormData] = useState({
+    type: "income",
+    amount: "",
+    category: "",
+    description: "",
+    date: today   // ✅ correct ISO8601 value
+  });
+
+
+  const [modalOpen, setModalOpen] = useState(false);
   useEffect(() => {
     fetchTransactions();
   }, []);
-
+  const token = localStorage.getItem("token");
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/api/transactions/all`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -34,79 +46,6 @@ const Transaction = () => {
       setTransactions(res.data.data.transactions);
       setPagination(res.data.data.pagination);
       setFilteredTransactions(res.data.data.transactions);
-      
-      // Mock data for demonstration
-      // const mockData = {
-      //   data: {
-      //     pagination: {
-      //       limit: 10,
-      //       page: 1,
-      //       pages: 2,
-      //       total: 15
-      //     },
-      //     transactions: [
-      //       {
-      //         _id: "69254a4c1d605305ad5c4cb0",
-      //         amount: 150000,
-      //         category: "Salary",
-      //         createdAt: "2025-11-25T06:18:52.612Z",
-      //         date: "2026-12-01T00:00:00.000Z",
-      //         description: "month end salary",
-      //         type: "income",
-      //         updatedAt: "2025-11-25T06:18:52.612Z",
-      //         userId: "692463126f8cad049abfc2dd"
-      //       },
-      //       {
-      //         _id: "69254a471d605305ad5c4cad",
-      //         amount: 5000,
-      //         category: "Food",
-      //         createdAt: "2025-11-24T08:15:30.123Z",
-      //         date: "2025-11-24T00:00:00.000Z",
-      //         description: "Grocery shopping",
-      //         type: "expense",
-      //         updatedAt: "2025-11-24T08:15:30.123Z",
-      //         userId: "692463126f8cad049abfc2dd"
-      //       },
-      //       {
-      //         _id: "69254a421d605305ad5c4caa",
-      //         amount: 2500,
-      //         category: "Transport",
-      //         createdAt: "2025-11-23T14:22:15.456Z",
-      //         date: "2025-11-23T00:00:00.000Z",
-      //         description: "Uber rides",
-      //         type: "expense",
-      //         updatedAt: "2025-11-23T14:22:15.456Z",
-      //         userId: "692463126f8cad049abfc2dd"
-      //       },
-      //       {
-      //         _id: "69254a3d1d605305ad5c4ca6",
-      //         amount: 15000,
-      //         category: "Freelance",
-      //         createdAt: "2025-11-22T10:45:20.789Z",
-      //         date: "2025-11-22T00:00:00.000Z",
-      //         description: "Client project payment",
-      //         type: "income",
-      //         updatedAt: "2025-11-22T10:45:20.789Z",
-      //         userId: "692463126f8cad049abfc2dd"
-      //       },
-      //       {
-      //         _id: "69254a381d605305ad5c4ca3",
-      //         amount: 3500,
-      //         category: "Entertainment",
-      //         createdAt: "2025-11-21T18:30:45.321Z",
-      //         date: "2025-11-21T00:00:00.000Z",
-      //         description: "Movie tickets and dinner",
-      //         type: "expense",
-      //         updatedAt: "2025-11-21T18:30:45.321Z",
-      //         userId: "692463126f8cad049abfc2dd"
-      //       }
-      //     ]
-      //   }
-      // };
-      
-      // setTransactions(mockData.data.transactions);
-      // setPagination(mockData.data.pagination);
-      // setFilteredTransactions(mockData.data.transactions);
       
     } catch (error) {
       console.log(error.message);
@@ -169,6 +108,34 @@ const Transaction = () => {
     }).format(amount);
   };
 
+  const handleChange = (e) => {
+    const {name,value} = e.target;
+    setFormData((prev)=>({...prev,[name]:value}));
+  };
+
+  const handleSubmitTransaction = async (e)=>{
+      e.preventDefault();
+      try {
+        const res = await axios.post(`${API_URL}/api/transactions/add`,formData,{
+          headers:{
+            Authorization:`Bearer ${token}`
+          }
+        });
+        setTransactions(prev=>[...prev,res.data.data.transaction])
+        console.log(res.data);
+        setModalOpen(false);
+        setFormData({
+          type: "income",
+          amount: "",
+          category: "",
+          description: "",
+          date: today
+        })
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-24 px-4 sm:px-6 lg:px-8">
@@ -188,7 +155,7 @@ const Transaction = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 sm:mb-0">Transactions</h1>
-          <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition transform hover:scale-105 flex items-center space-x-2">
+          <button onClick={()=>setModalOpen(true)} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition transform hover:scale-105 flex items-center space-x-2">
             <Plus className="w-5 h-5" />
             <span>Add Transaction</span>
           </button>
@@ -427,6 +394,97 @@ const Transaction = () => {
             </>
           )}
         </div>
+        {modalOpen && <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Add Budget">
+          <form onSubmit={handleSubmitTransaction} className="space-y-4">
+
+            {/* Category */}
+           <div>
+              <label className="block text-gray-300 text-sm mb-1">Type</label>
+              <select value={formData.type}
+              onChange={handleChange}
+              name='type'
+                className="w-full bg-slate-700/50 border border-purple-500/30 text-white px-4 py-2 rounded-lg
+                          focus:outline-none focus:border-purple-500"
+              >
+                <option value="">Select type</option>
+                {[
+                  'income','expense'
+                ] .map((m, index) => (
+                  <option key={index} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Limit */}
+            <div>
+              <label className="block text-gray-300 text-sm mb-1">Amount (₹)</label>
+              <input
+                type="number"
+                name='amount'
+                value={formData.amount}
+                onChange={handleChange}
+                className="w-full bg-slate-700/50 border border-purple-500/30 text-white px-4 py-2 rounded-lg
+                          focus:outline-none focus:border-purple-500"
+                placeholder="Enter amount"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 text-sm mb-1">category</label>
+              <select value={formData.category}
+              onChange={handleChange}
+              name='category'
+                className="w-full bg-slate-700/50 border border-purple-500/30 text-white px-4 py-2 rounded-lg
+                          focus:outline-none focus:border-purple-500"
+              >
+                <option value="">Select Category</option>
+                {['Salary', 'Freelance', 'Investment', 'Gift', 'Other Income','Trip',
+                  'Food', 'Rent', 'Utilities', 'Transportation', 'Healthcare',
+                  'Entertainment', 'Shopping', 'Education', 'Travel', 'Groceries',
+                  'Insurance', 'Debt Payment', 'Savings', 'Other Expense'
+                ] .map((m, index) => (
+                  <option key={index} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Alert Threshold */}
+            <div>
+              <label className="block text-gray-300 text-sm mb-1">Description</label>
+              <textarea value={formData.description} rows={4}
+              onChange={handleChange}
+              name='description'
+                type="number"
+                className="w-full bg-slate-700/50 border border-purple-500/30 text-white px-4 py-2 rounded-lg
+                          focus:outline-none focus:border-purple-500"
+                placeholder="e.g., 80"
+              />
+            </div>
+
+            {/* Date */}
+            <div>
+              <label className="block text-gray-300 text-sm mb-1">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="w-full bg-slate-700/50 border border-purple-500/30 text-white px-4 py-2 rounded-lg
+                          focus:outline-none focus:border-purple-500"
+              />
+            </div>
+
+
+            {/* Submit Button */}
+            <button
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg mt-4 
+                        transition-colors font-semibold"
+            >
+              Save Budget
+            </button>
+          </form>
+        </Modal>
+      }
       </div>
     </div>
   );

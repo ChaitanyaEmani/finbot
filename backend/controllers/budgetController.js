@@ -6,8 +6,7 @@ import Transaction from '../models/transactionModel.js';
 // @access  Private
 export const setBudget = async (req, res) => {
   try {
-    const { category, limit, month, year, alertThreshold } = req.body;
-
+    const { category, limit, month, year, alertThreshold } = req.body; 
     // Calculate current spent for this category
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);

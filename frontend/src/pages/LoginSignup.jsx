@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, DollarSign, Wallet, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, DollarSign, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 export default function LoginSignupPage() {
   const API_URL=import.meta.env.VITE_BASE_API_URL;

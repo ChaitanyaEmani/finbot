@@ -1,11 +1,8 @@
 // pages/Home.jsx
-import React,{useState} from 'react';
+import React from 'react';
 import { ArrowRight, TrendingUp, Shield, Zap, BarChart3, Brain, Wallet, ChevronRight, Check } from 'lucide-react';
-import Modal from '../components/Modal';
-import LoginSignup from './LoginSignup';
 import { useNavigate } from 'react-router-dom';
 const Home = () => {
-  const [modalOpen,setModalOpen] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const features = [
@@ -229,7 +226,7 @@ const Home = () => {
           <p className="text-xl text-gray-300 mb-8">
             Join thousands of users who are already saving more and spending smarter with SaveUp.
           </p>
-          {token && <button className="bg-white text-purple-900 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:scale-105 flex items-center space-x-2 mx-auto">
+          {token && <button onClick={()=>navigate('/chat')} className="bg-white text-purple-900 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-2xl transition transform hover:scale-105 flex items-center space-x-2 mx-auto">
             <span>See Your Budgets</span>
             <ArrowRight className="w-5 h-5" />
           </button>}
