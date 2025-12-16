@@ -39,7 +39,7 @@ if (process.env.NODE_ENV !== "production") {
 
 // CORS
 const allowedOrigins = [
-  "https://finbot-ten.vercel.app",
+  "https://saveup-ten.vercel.app",
   "http://localhost:5173"
 ];
 
