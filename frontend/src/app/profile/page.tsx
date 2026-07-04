@@ -105,11 +105,11 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col md:flex-row h-screen w-screen bg-background overflow-hidden text-zinc-100">
       <Navigation />
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full space-y-8">
+      <main className="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full space-y-8 overflow-y-auto">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Profile Settings</h1>
           <p className="text-sm text-zinc-400 mt-1">Manage your account information and preferences</p>

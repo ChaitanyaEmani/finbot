@@ -12,7 +12,8 @@ import {
   LogOut, 
   Menu, 
   X,
-  User 
+  User,
+  Bot
 } from 'lucide-react';
 
 export const Navigation: React.FC = () => {
@@ -32,8 +33,8 @@ export const Navigation: React.FC = () => {
       {/* Mobile Top Header */}
       <header className="md:hidden flex items-center justify-between px-6 h-16 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center font-bold text-lg text-white shadow-lg">
-            F
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg">
+            <Bot className="w-4 h-4 text-white" />
           </div>
           <span className="font-bold text-lg tracking-tight text-white">finbot</span>
         </div>
@@ -102,8 +103,8 @@ export const Navigation: React.FC = () => {
       <aside className="hidden md:flex flex-col justify-between w-64 h-screen sticky top-0 border-r border-zinc-850 bg-zinc-950 p-6">
         <div className="space-y-8">
           <Link href="/dashboard" className="flex items-center space-x-2.5 px-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-violet-500/10">
-              F
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-violet-500/10">
+              <Bot className="w-5 h-5 text-white" />
             </div>
             <span className="font-bold text-xl tracking-tight text-white">finbot</span>
           </Link>

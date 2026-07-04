@@ -102,7 +102,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden relative">
+    <div className="flex flex-col md:flex-row h-screen w-screen bg-background text-zinc-100 overflow-hidden relative">
       {/* Background glow highlights */}
       <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full bg-violet-600/5 blur-[130px] pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-[400px] h-[400px] rounded-full bg-indigo-650/5 blur-[130px] pointer-events-none" />
@@ -110,7 +110,7 @@ export default function Chat() {
       <Navigation />
 
       {/* Main chat window container */}
-      <main className="flex-grow flex flex-col h-screen max-w-5xl mx-auto w-full border-x border-zinc-900/40 relative z-10">
+      <main className="flex-grow flex flex-col h-[calc(100vh-4rem)] md:h-screen max-w-5xl mx-auto w-full border-x border-zinc-900/40 relative z-10">
         
         {/* Header */}
         <div className="p-5 border-b border-zinc-900/60 bg-zinc-950/40 backdrop-blur-md flex items-center justify-between">

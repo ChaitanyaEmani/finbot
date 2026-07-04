@@ -5,11 +5,11 @@ import { User } from '../models/User';
 const getSecret = () => process.env.JWT_SECRET || 'fallback_secret_for_finbot';
 
 export const registerUser = async (
-  name: string, 
-  email: string, 
-  password: string, 
-  currency?: string, 
-  country?: string, 
+  name: string,
+  email: string,
+  password: string,
+  currency?: string,
+  country?: string,
   monthlyIncome?: number
 ) => {
   // Check for existing user
@@ -18,6 +18,9 @@ export const registerUser = async (
     throw new Error('User already exists with this email');
   }
 
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters long');
+  }
   // Hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);

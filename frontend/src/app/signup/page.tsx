@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
-import { User, Mail, Lock, ArrowRight, Loader2, Globe, Coins, DollarSign } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Loader2, Globe, Coins, DollarSign, Bot } from 'lucide-react';
 
 export default function Signup() {
   const { register } = useAuth();
@@ -23,8 +23,8 @@ export default function Signup() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
@@ -60,8 +60,8 @@ export default function Signup() {
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-4 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center font-bold text-lg text-white shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform">
-              F
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform">
+              <Bot className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-xl tracking-tight text-white group-hover:text-zinc-200 transition-colors">
               finbot

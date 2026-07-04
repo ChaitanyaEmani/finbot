@@ -164,7 +164,7 @@ export default function Budgets() {
   });
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-zinc-950">
+    <div className="flex flex-col md:flex-row h-screen w-screen bg-background overflow-hidden">
       <Navigation />
 
       <main className="flex-grow p-6 md:p-10 space-y-8 overflow-y-auto max-w-7xl mx-auto w-full">
@@ -243,7 +243,7 @@ export default function Budgets() {
                             </button>
                             <button
                               onClick={() => handleDelete(b._id)}
-                              className="p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-555 hover:text-rose-400 transition cursor-pointer"
+                              className="p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-rose-400 transition cursor-pointer"
                               disabled={actionLoading}
                               title="Remove budget limit"
                             >

@@ -179,7 +179,7 @@ function TransactionsContent() {
   });
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-zinc-950">
+    <div className="flex flex-col md:flex-row h-screen w-screen bg-background overflow-hidden">
       <Navigation />
 
       <main className="flex-grow p-6 md:p-10 space-y-8 overflow-y-auto max-w-7xl mx-auto w-full">
@@ -280,31 +280,47 @@ function TransactionsContent() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse">
+                <table className="w-full text-left text-sm border-collapse table-fixed">
                   <thead>
-                    <tr className="border-b border-zinc-850 text-zinc-400 text-xs font-semibold uppercase tracking-wider">
-                      <th className="pb-3.5 font-medium">Type</th>
-                      <th className="pb-3.5 font-medium">Category</th>
-                      <th className="pb-3.5 font-medium">Description</th>
-                      <th className="pb-3.5 font-medium">Date</th>
-                      <th className="pb-3.5 font-medium">Amount</th>
-                      <th className="pb-3.5 font-medium text-center w-16">Action</th>
+                    <tr className="border-b border-zinc-855 text-zinc-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                      <th className="pb-3 font-medium w-[22%] sm:w-[15%] md:w-[15%]">Type</th>
+                      <th className="pb-3 font-medium w-[30%] sm:w-[22%] md:w-[15%]">Category</th>
+                      <th className="pb-3 font-medium hidden sm:table-cell sm:w-[33%] md:w-[25%]">Description</th>
+                      <th className="pb-3 font-medium hidden md:table-cell md:w-[15%]">Date</th>
+                      <th className="pb-3 font-medium text-right pr-4 w-[26%] sm:w-[20%] md:w-[15%]">Amount</th>
+                      <th className="pb-3 font-medium text-center w-[22%] sm:w-[10%] md:w-[15%]">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-900/60">
                     {filteredTransactions.map(tx => (
-                      <tr key={tx._id} className="group hover:bg-zinc-900/5">
-                        <td className="py-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-455' : 'bg-rose-500/10 text-rose-400'
+                      <tr key={tx._id} className="group hover:bg-zinc-900/10 transition-colors">
+                        <td className="py-2.5 sm:py-3">
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] sm:text-xs font-bold uppercase tracking-wider ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-rose-500/10 text-rose-400'
                             }`}>
                             {tx.type}
                           </span>
                         </td>
-                        <td className="py-4 font-semibold text-white">{tx.category}</td>
-                        <td className="py-4 text-zinc-400 max-w-[240px] truncate" title={tx.description}>
+                        <td className="py-2.5 sm:py-3">
+                          <div className="text-xs sm:text-sm font-semibold text-white">{tx.category}</div>
+                          {tx.description && (
+                            <div className="text-[10px] text-zinc-400 truncate max-w-[120px] sm:hidden mt-0.5" title={tx.description}>
+                              {tx.description}
+                            </div>
+                          )}
+                          <div className="text-[9px] text-zinc-500 md:hidden mt-0.5" suppressHydrationWarning>
+                            {new Date(tx.date).toLocaleString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: false
+                            })}
+                          </div>
+                        </td>
+                        <td className="py-2.5 sm:py-3 text-xs text-zinc-450 max-w-[240px] truncate hidden sm:table-cell" title={tx.description}>
                           {tx.description || '-'}
                         </td>
-                        <td className="py-4 text-zinc-500 text-xs" suppressHydrationWarning>
+                        <td className="py-2.5 sm:py-3 text-zinc-500 text-xs hidden md:table-cell" suppressHydrationWarning>
                           {new Date(tx.date).toLocaleString(undefined, {
                             year: 'numeric',
                             month: 'short',
@@ -314,26 +330,26 @@ function TransactionsContent() {
                             hour12: false
                           })}
                         </td>
-                        <td className={`py-4 font-semibold ${tx.type === 'income' ? 'text-emerald-450' : 'text-rose-400'}`}>
+                        <td className={`py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-right pr-4 ${tx.type === 'income' ? 'text-emerald-450' : 'text-rose-400'}`}>
                           {tx.type === 'income' ? '+' : '-'}{currencySymbol}{tx.amount.toFixed(2)}
                         </td>
-                        <td className="py-4 text-center">
-                          <div className="flex items-center justify-center space-x-1.5">
+                        <td className="py-2.5 sm:py-3 text-center">
+                          <div className="flex items-center justify-center space-x-1 sm:space-x-1.5">
                             <button
                               onClick={() => handleEditClick(tx)}
-                              className="p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-violet-400 transition cursor-pointer"
+                              className="p-1 sm:p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-violet-400 transition cursor-pointer"
                               title="Edit transaction"
                               disabled={actionLoading}
                             >
-                              <Edit3 className="w-4 h-4" />
+                              <Edit3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(tx._id)}
-                              className="p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-500 hover:text-rose-455 transition cursor-pointer"
+                              className="p-1 sm:p-1.5 rounded-lg border border-transparent hover:border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-rose-455 transition cursor-pointer"
                               title="Delete transaction"
                               disabled={actionLoading}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         </td>

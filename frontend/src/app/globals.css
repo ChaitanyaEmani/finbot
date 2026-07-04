@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
+  --background: #09090b; /* Pure pitch-black background */
   --foreground: #f4f4f5;
-  --card: #18181b;
+  --card: #18181b; /* Charcoal card backgrounds */
   --card-foreground: #f4f4f5;
   --popover: #09090b;
   --popover-foreground: #f4f4f5;
-  --primary: #8b5cf6;
-  --primary-foreground: #f4f4f5;
+  --primary: #10B981; /* Emerald-500 */
+  --primary-hover: #059669; /* Emerald-600 */
+  --primary-light: #34D399; /* Emerald-400 */
+  --primary-glow: rgba(16, 185, 129, 0.15);
+  --primary-foreground: #09090b;
   --secondary: #27272a;
   --secondary-foreground: #f4f4f5;
   --muted: #27272a;
@@ -19,7 +22,7 @@
   --destructive-foreground: #f4f4f5;
   --border: #27272a;
   --input: #27272a;
-  --ring: #d8b4fe;
+  --ring: #34D399;
 }
 
 @theme inline {
@@ -41,6 +44,51 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --font-sans: 'Inter', var(--font-geist-sans);
+
+  /* Add missing tailwind colors used in frontend codebase */
+  --color-zinc-850: #1b1b1f;
+  --color-zinc-855: #18181c;
+  --color-zinc-955: #050507;
+  --color-zinc-150: #e4e4e7;
+  --color-zinc-305: #d4d4d8;
+  --color-zinc-450: #71717a;
+  --color-zinc-455: #52525b;
+  --color-zinc-550: #3f3f46;
+  --color-zinc-555: #27272a;
+  --color-emerald-450: #34D399;
+  --color-rose-455: #e11d48;
+  --color-rose-450: #f43f5e;
+
+  /* Redirect Violet theme to reference CSS variables dynamically (Emerald-based) */
+  --color-violet-50: #ECFDF5;
+  --color-violet-100: #D1FAE5;
+  --color-violet-200: #A7F3D0;
+  --color-violet-300: #6EE7B7;
+  --color-violet-400: var(--primary-light);
+  --color-violet-500: var(--primary);
+  --color-violet-600: var(--primary-hover);
+  --color-violet-700: var(--primary-hover);
+  --color-violet-800: #064E3B;
+  --color-violet-900: #064E3B;
+  --color-violet-955: #022C22;
+  
+  --color-violet-350: var(--primary-light);
+  --color-violet-405: var(--primary-light);
+  --color-violet-450: var(--primary-light);
+  --color-violet-650: var(--primary-hover);
+
+  /* Redirect Indigo theme to reference a Teal palette for premium green-teal gradients */
+  --color-indigo-50: #F0FDFA;
+  --color-indigo-100: #CCFBF1;
+  --color-indigo-200: #99F6E4;
+  --color-indigo-300: #5EEAD4;
+  --color-indigo-400: #2DD4BF;
+  --color-indigo-500: #14B8A6;
+  --color-indigo-600: #0D9488;
+  --color-indigo-700: #0F766E;
+  --color-indigo-800: #115E59;
+  --color-indigo-900: #134E4A;
+  --color-indigo-950: #042F2E;
 }
 
 body {
@@ -71,10 +119,13 @@ body {
 
 /* Animations */
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.05);
