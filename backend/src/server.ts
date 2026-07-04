@@ -17,16 +17,20 @@ const app = express();
 
 // Middlewares
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:3000',
-  'http://localhost:3000', // always allow local dev
-];
+  (process.env.FRONTEND_URL || '').replace(/\/$/, '').toLowerCase(),
+  'http://localhost:3000',
+  'http://localhost:3001',
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+    // Allow requests with no origin (curl, Postman, mobile)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error(`CORS blocked: ${origin}`));
+    const normalised = origin.replace(/\/$/, '').toLowerCase();
+    if (allowedOrigins.includes(normalised)) return callback(null, true);
+    // Log but don't crash — just deny silently
+    console.warn(`CORS denied for origin: ${origin}`);
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
