@@ -31,7 +31,7 @@ export const Navigation: React.FC = () => {
   return (
     <>
       {/* Mobile Top Header */}
-      <header className="md:hidden flex items-center justify-between px-6 h-16 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-6 pt-5 pb-4 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg">
             <Bot className="w-4 h-4 text-white" />
@@ -48,7 +48,7 @@ export const Navigation: React.FC = () => {
 
       {/* Mobile Navigation Drawer */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-zinc-950 flex flex-col justify-between pt-20 px-6 pb-6">
+        <div className="md:hidden fixed inset-0 z-30 bg-zinc-950 flex flex-col justify-between pt-24 px-6 pb-6">
           <nav className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
