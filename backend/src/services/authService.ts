@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 
-const getSecret = () => process.env.JWT_SECRET || 'fallback_secret_for_finbot';
+const getSecret = () => process.env.JWT_SECRET || 'fallback_secret_for_saveup';
 
 export const registerUser = async (
   name: string,

@@ -7,7 +7,7 @@ const getHeaders = () => {
   };
 
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('finbot_token');
+    const token = localStorage.getItem('saveup_token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -49,7 +49,7 @@ export const authService = {
       body: JSON.stringify(userData),
     });
     if (data.token) {
-      localStorage.setItem('finbot_token', data.token);
+      localStorage.setItem('saveup_token', data.token);
     }
     return data;
   },
@@ -60,13 +60,13 @@ export const authService = {
       body: JSON.stringify(credentials),
     });
     if (data.token) {
-      localStorage.setItem('finbot_token', data.token);
+      localStorage.setItem('saveup_token', data.token);
     }
     return data;
   },
 
   logout: () => {
-    localStorage.removeItem('finbot_token');
+    localStorage.removeItem('saveup_token');
   },
 
   getProfile: async () => {
@@ -88,7 +88,7 @@ export const authService = {
 
   isAuthenticated: () => {
     if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('finbot_token');
+    return !!localStorage.getItem('saveup_token');
   },
 };
 

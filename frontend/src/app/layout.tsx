@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FinBot | AI Personal Finance Advisor",
+  title: "SaveUp | AI Personal Finance Advisor",
   description: "Manage transactions, plan monthly budgets, and get personalized financial recommendations from a smart AI chatbot.",
 };
 

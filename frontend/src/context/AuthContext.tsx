@@ -43,7 +43,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           monthlyIncome: profile.monthlyIncome || profile.monthlyBudget,
         });
       } catch (err) {
-        console.error('Failed to load profile', err);
+        // Silently clear session if user is not found or unauthorized to avoid console/terminal pollution from expired sessions
+        const errMessage = err instanceof Error ? err.message : '';
+        const isAuthError = errMessage.includes('User not found') || errMessage.includes('not authorized') || errMessage.includes('Unauthorized');
+        if (!isAuthError) {
+          console.error('Failed to load profile:', err);
+        }
         authService.logout();
         setUser(null);
       }

@@ -9,8 +9,7 @@ import {
   ArrowRight, 
   Shield, 
   Zap, 
-  Layers,
-  Bot
+  Layers
 } from 'lucide-react';
 
 export default function Home() {
@@ -27,10 +26,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-violet-500/20">
-              <Bot className="w-4 h-4 text-white" />
+              <TrendingUp className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-              finbot
+              SaveUp
             </span>
           </div>
 
@@ -173,7 +172,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-zinc-900/80 py-8 px-6 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p suppressHydrationWarning>© {new Date().getFullYear()} finbot. All rights reserved.</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} SaveUp. All rights reserved.</p>
           <div className="flex items-center space-x-6">
             <span className="flex items-center text-zinc-400">
               <Shield className="w-3.5 h-3.5 mr-1" />

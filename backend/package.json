@@ -1,5 +1,5 @@
 {
-  "name": "finbot-backend",
+  "name": "saveup-backend",
   "version": "1.0.0",
   "description": "Financial tracker backend with AI bot support",
   "main": "dist/server.js",

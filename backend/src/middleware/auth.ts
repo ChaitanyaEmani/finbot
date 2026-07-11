@@ -18,7 +18,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   const token = authHeader.split(' ')[1];
 
   try {
-    const secret = process.env.JWT_SECRET || 'fallback_secret_for_finbot';
+    const secret = process.env.JWT_SECRET || 'fallback_secret_for_saveup';
     const decoded = jwt.verify(token, secret) as { id: string; email: string };
     
     req.user = {

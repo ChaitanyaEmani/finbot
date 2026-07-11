@@ -33,7 +33,7 @@ export default function Chat() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hello! I'm FinBot, your financial AI advisor. I can analyze your transactions and budgets to offer custom savings suggestions or answer general financial questions. What would you like to discuss today?",
+      content: "Hello! I'm SaveUp, your financial AI advisor. I can analyze your transactions and budgets to offer custom savings suggestions or answer general financial questions. What would you like to discuss today?",
       timestamp: new Date()
     }
   ]);
@@ -120,7 +120,7 @@ export default function Chat() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white flex items-center space-x-1.5 leading-none">
-                <span>FinBot AI Advisor</span>
+                <span>SaveUp AI Advisor</span>
                 <Sparkles className="w-3.5 h-3.5 text-violet-400 fill-violet-400/20" />
               </h1>
               <div className="flex items-center space-x-1.5 mt-1.5">
@@ -179,7 +179,7 @@ export default function Chat() {
               </div>
               <div className="p-4 rounded-2xl border border-zinc-850 bg-zinc-900/10 text-zinc-400 text-sm flex items-center space-x-2.5 shadow-sm">
                 <Loader2 className="w-4.5 h-4.5 animate-spin text-violet-500" />
-                <span className="font-medium">FinBot is analyzing your ledger...</span>
+                <span className="font-medium">SaveUp is analyzing your ledger...</span>
               </div>
             </div>
           )}

@@ -505,7 +505,7 @@ export default function Dashboard() {
                   <div className="absolute top-[-20%] right-[-10%] w-24 h-24 rounded-full bg-violet-650/10 blur-xl pointer-events-none" />
                   
                   <div className="space-y-2">
-                    <h3 className="font-bold text-white text-base">Ask FinBot</h3>
+                    <h3 className="font-bold text-white text-base">Ask SaveUp</h3>
                     <p className="text-zinc-400 text-xs leading-relaxed">
                       Need tips on how to lower your food spending or save more this month? Tap below to chat with our AI advisor.
                     </p>

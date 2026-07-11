@@ -13,7 +13,7 @@ import {
   Menu, 
   X,
   User,
-  Bot
+  TrendingUp
 } from 'lucide-react';
 
 export const Navigation: React.FC = () => {
@@ -34,9 +34,9 @@ export const Navigation: React.FC = () => {
       <header className="md:hidden flex items-center justify-between px-6 pt-5 pb-4 border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg">
-            <Bot className="w-4 h-4 text-white" />
+            <TrendingUp className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-lg tracking-tight text-white">finbot</span>
+          <span className="font-bold text-lg tracking-tight text-white">SaveUp</span>
         </div>
         <button 
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -104,9 +104,9 @@ export const Navigation: React.FC = () => {
         <div className="space-y-8">
           <Link href="/dashboard" className="flex items-center space-x-2.5 px-2">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-violet-500/10">
-              <Bot className="w-5 h-5 text-white" />
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-white">finbot</span>
+            <span className="font-bold text-xl tracking-tight text-white">SaveUp</span>
           </Link>
 
           <nav className="space-y-1.5">

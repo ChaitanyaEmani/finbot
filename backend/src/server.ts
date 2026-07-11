@@ -40,11 +40,11 @@ app.use(express.json());
 
 // Keep-alive/awake Ping Route (Render Free-Tier support)
 app.get('/ping', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'FinBot Server is active', timestamp: new Date() });
+  res.status(200).json({ status: 'ok', message: 'SaveUp Server is active', timestamp: new Date() });
 });
 
 app.get('/api/ping', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'FinBot Server API is active', timestamp: new Date() });
+  res.status(200).json({ status: 'ok', message: 'SaveUp Server API is active', timestamp: new Date() });
 });
 
 // API Routes

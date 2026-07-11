@@ -49,7 +49,7 @@ export const getChatResponse = async (userId: string, messages: Array<{ role: st
     if (!apiKey) {
       // Mock Response when API Key is missing
       const lastUserMessage = messages[messages.length - 1]?.content || '';
-      let mockReply = `Hello! I am FinBot, your financial assistant. Currently, the \`OPEN_ROUTER_API_KEY\` environment variable is not configured on the backend server. 
+      let mockReply = `Hello! I am SaveUp, your financial assistant. Currently, the \`OPEN_ROUTER_API_KEY\` environment variable is not configured on the backend server. 
       
 To activate me fully, please add your key to the backend \`.env\` file:
 \`\`\`env
@@ -76,7 +76,7 @@ Please configure the API key, and I will be ready to give you smart recommendati
     }
 
     // 2. Build system instruction with context
-    const systemPrompt = `You are FinBot, a professional, highly skilled personal finance AI advisor. 
+    const systemPrompt = `You are SaveUp, a professional, highly skilled personal finance AI advisor. 
 You analyze the user's financial data and answer questions accurately, providing helpful, actionable advice.
 
 Here is the user's profile and actual financial data:
@@ -124,8 +124,8 @@ Instructions:
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://github.com/ChaitanyaEmani/finbot',
-        'X-Title': 'FinBot Financial AI Assistant',
+        'HTTP-Referer': 'https://github.com/ChaitanyaEmani/saveup',
+        'X-Title': 'SaveUp Financial AI Assistant',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(apiBody),
